@@ -81,7 +81,7 @@ router.post("/change-password", async (req, res) => {
 router.post("/reset-password/:userId", async (req, res) => {
     try {
         const user = await UserSchema.findOne({ _id: req.currentUser._id });
-        if (user && user.type == "ADMIN") {
+        if (user && user.type === "ADMIN") {
             const password = AppUntil.GeneratePassword();
 
             const hashPassword = await argon2.hash(password)
@@ -89,10 +89,12 @@ router.post("/reset-password/:userId", async (req, res) => {
 
             await UserSchema.updateOne({ _id: req.params.userId }, { $set: { password: hashPassword, isFirst: true } })
 
+            console.log(password, "password")
+
             const sendMail = AppUntil.SendEmail(
                 findUser.email,
                 "Reset password destination app",
-                `</div>
+                `<div>
                             <div>
                                 New Password: 
                                 <h3>${password}</h3>
